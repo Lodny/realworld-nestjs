@@ -1,35 +1,40 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { WrapCreateUserDto } from './dto/wrap-create-user.dto';
+import { ResponseUserDto } from './dto/response-user.dto';
+import { copyBasedOnDestination } from '../util';
+import { WrapLoginUserDto } from './dto/wrap-login-user.dto';
 
 @Controller('api/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  async create(@Body() wrapCreateUserDto: WrapCreateUserDto) {
-    console.log('users.controller::create(): wrapCreateUserDto:', wrapCreateUserDto);
+  async register(@Body() wrapCreateUserDto: WrapCreateUserDto) {
+    console.log('users.controller::register(): wrapCreateUserDto:', wrapCreateUserDto);
     const user = await this.usersService.create(wrapCreateUserDto.user);
-    console.log('users.controller::create(): user:', user);
+    console.log('users.controller::register(): user:', user);
 
-    return user;
+    return copyBasedOnDestination(new ResponseUserDto(), { ...user, token: 'token' });
   }
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
+  @Post('/login')
+  async login(@Body() wrapLoginUserDto: WrapLoginUserDto) {
+    console.log('users.controller::login(): wrapLoginUserDto:', wrapLoginUserDto);
+    const loginUser = await this.usersService.login(wrapLoginUserDto.user);
+    console.log('users.controller::login(): loginUser:', loginUser);
+
+    return copyBasedOnDestination(new ResponseUserDto(), { ...loginUser, token: 'token' });
   }
+
+  // @Get()
+  // findAll() {
+  //   return this.usersService.findAll();
+  // }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
   }
 
   @Delete(':id')

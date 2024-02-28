@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaService } from '../prisma.service';
-import { Prisma, Users } from '@prisma/client';
+import { PrismaRepository } from '../prisma-repository.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
 
 
 // import { PrismaClient } from '@prisma/client'
@@ -11,36 +12,43 @@ import { Prisma, Users } from '@prisma/client';
 @Injectable()
 export class UsersService {
 
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaRepository) {}
 
-  create(data: Prisma.UsersCreateInput) : Promise<Users> {
-  // async create(data: CreateUserDto) : Promise<Users> {
+  async create(data: CreateUserDto) {
     return this.prismaService.users.create({
       data
     });
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async login(loginUserDto: LoginUserDto) {
+    const foundUser = this.prismaService.users.findUnique({
+      where: {email: loginUserDto.email}
+    });
+
+    console.log('users.service::login(): foundUser:', foundUser);
+    return foundUser;
   }
 
   findOne(id: number) {
     return `This action returns a #${id} user`;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  currentUser() {
+    return 'return current user';
+  }
+
+  async update(updateUserDto: UpdateUserDto) {
+    const foundUser = this.prismaService.users.findUnique({
+      where: {email: updateUserDto.email}
+    });
+
+    console.log('users.service::update(): foundUser:', foundUser);
+
+    return foundUser;
   }
 
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
-
-  currentUser() {
-    return 'return current user';
-  }
-
-  updateUser() {
-    return 'return update user';
-  }
+  // async login(where: Prisma.UsersWhereUniqueInput) {
 }
