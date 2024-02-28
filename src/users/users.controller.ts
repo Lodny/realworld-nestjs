@@ -2,15 +2,19 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { WrapCreateUserDto } from './dto/wrap-create-user.dto';
 
 @Controller('api/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    console.log('users.controller::create(): createUserDto:', createUserDto);
-    return this.usersService.create(createUserDto);
+  async create(@Body() wrapCreateUserDto: WrapCreateUserDto) {
+    console.log('users.controller::create(): wrapCreateUserDto:', wrapCreateUserDto);
+    const user = await this.usersService.create(wrapCreateUserDto.user);
+    console.log('users.controller::create(): user:', user);
+
+    return user;
   }
 
   @Get()
