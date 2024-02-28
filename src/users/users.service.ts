@@ -23,4 +23,12 @@ export class UsersService {
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
+
+  currentUser() {
+    return 'return current user';
+  }
+
+  updateUser() {
+    return 'return update user';
+  }
 }
