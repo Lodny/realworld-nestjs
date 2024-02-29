@@ -16,7 +16,7 @@ export class UsersService {
   }
 
   async login(loginUserDto: LoginUserDto) {
-    const foundUser = this.prismaRepository.users.findUnique({
+    const foundUser = await this.prismaRepository.users.findUnique({
       where: {email: loginUserDto.email}
     });
 
