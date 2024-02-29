@@ -20,7 +20,7 @@ export class UsersController {
   }
 
   @Post('/login')
-  async login(@Body(new ValidationPipe()) wrapLoginUserDto: WrapLoginUserDto) {
+  async login(@Body() wrapLoginUserDto: WrapLoginUserDto) {
     console.log('users.controller::login(): wrapLoginUserDto:', wrapLoginUserDto);
     const loginUser = await this.usersService.login(wrapLoginUserDto.user);
     console.log('users.controller::login(): loginUser:', loginUser);
@@ -29,14 +29,14 @@ export class UsersController {
   }
 
   @Post('/login2')
-  login2(@Body(new ValidationPipe()) loginUserDto: LoginUserDto) {
+  login2(@Body() loginUserDto: LoginUserDto) {
   // login2(@Body() loginUserDto: LoginUserDto) {
     console.log('users.controller::login2(): loginUserDto:', loginUserDto);
   }
 
   //todo::check @ValidateNested()
   @Post('/login3')
-  async login3(@Body(new ValidationPipe()) wrapLoginUserDto: WrapLoginUserDto) {
+  async login3(@Body() wrapLoginUserDto: WrapLoginUserDto) {
     console.log('users.controller::login2(): wrapLoginUserDto:', wrapLoginUserDto);
   }
 
