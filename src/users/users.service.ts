@@ -35,15 +35,17 @@ export class UsersService {
       HttpStatus.NOT_FOUND);
   }
 
-  update(updateUserDto: UpdateUserDto) {
-    const foundUser = this.findOneBy(
+  async update(updateUserDto: UpdateUserDto, loginUserId: number) {
+    const foundUser = await this.findOneBy(
       {email: updateUserDto.email},
       'username or password is invalid',
       HttpStatus.NOT_FOUND);
-    //todo::check values
+
+    if (foundUser.id !== loginUserId)
+      throw new HttpException('The logged-in user and the user information provided for modification are different.', HttpStatus.BAD_REQUEST);
 
     const updatedUser = this.prismaRepository.users.update({
-      where: {email: updateUserDto.email},
+      where: {id: loginUserId},
       data: updateUserDto
     });
 
