@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaRepository } from '../prisma-repository.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -15,10 +15,13 @@ export class UsersService {
     });
   }
 
-  login(loginUserDto: LoginUserDto) {
+  async login(loginUserDto: LoginUserDto) {
     const foundUser = this.prismaRepository.users.findUnique({
       where: {email: loginUserDto.email}
     });
+
+    if (!foundUser)
+      throw new HttpException('username or password is invalid', HttpStatus.NOT_FOUND);
 
     console.log('users.service::login(): foundUser:', foundUser);
     return foundUser;
