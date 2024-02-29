@@ -15,7 +15,7 @@ export class UsersController {
     const user = await this.usersService.create(wrapCreateUserDto.user);
     console.log('users.controller::register(): user:', user);
 
-    return copyBasedOnDestination(new ResponseUserDto(), { ...user, token: 'token' });
+    return {user: copyBasedOnDestination(new ResponseUserDto(), {...user, token: 'token'})};
   }
 
   @Post('/login')
@@ -24,7 +24,7 @@ export class UsersController {
     const loginUser = await this.usersService.login(wrapLoginUserDto.user);
     console.log('users.controller::login(): loginUser:', loginUser);
 
-    return copyBasedOnDestination(new ResponseUserDto(), { ...loginUser, token: 'token' });
+    return {user: copyBasedOnDestination(new ResponseUserDto(), {...loginUser, token: 'token'})};
   }
 
   // @Get()

@@ -24,14 +24,6 @@ export class UsersService {
     return foundUser;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  currentUser() {
-    return 'return current user';
-  }
-
   async update(updateUserDto: UpdateUserDto) {
     // const foundUser = this.prismaRepository.users.findUniqueOrThrow({
     //   where: {email: updateUserDto.email}
@@ -48,6 +40,23 @@ export class UsersService {
     return updatedUser;
   }
 
+  async findOneByUsername(username: string) {
+    const foundUser = this.prismaRepository.users.findUniqueOrThrow({
+      where: {username},
+    });
+
+    console.log('users.service::findOneByUsername(): foundUser:', foundUser);
+
+    return foundUser;
+  }
+
+  findOne(id: number) {
+    return `This action returns a #${id} user`;
+  }
+
+  currentUser() {
+    return 'return current user';
+  }
   remove(id: number) {
     return `This action removes a #${id} user`;
   }

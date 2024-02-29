@@ -19,7 +19,7 @@ export class UserController {
     const updatedUser = await this.usersService.update(wrapCreateUserDto.user);
     console.log('user.controller::updateUser(): updatedUser:', updatedUser);
 
-    return copyBasedOnDestination(new ResponseUserDto(), { ...updatedUser, token: 'token' });
+    return {user: copyBasedOnDestination(new ResponseUserDto(), {...updatedUser, token: 'token'})};
   }
 
   // @Patch(':id')
