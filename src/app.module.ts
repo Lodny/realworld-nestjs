@@ -8,13 +8,13 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    UsersModule
-    , UserModule
-    , ProfilesModule
-    , ConfigModule.forRoot({
+    ConfigModule.forRoot({
       isGlobal: true,
       // envFilePath: `.${process.env.NODE_EVN}.env`,
     })
+    , UsersModule
+    , UserModule
+    , ProfilesModule
   ],
   controllers: [AppController],
   providers: [AppService],

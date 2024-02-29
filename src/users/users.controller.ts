@@ -5,27 +5,14 @@ import { ResponseUserDto } from './dto/response-user.dto';
 import { copyBasedOnDestination } from '../util';
 import { WrapLoginUserDto } from './dto/wrap-login-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
+import { AuthService } from '../auth/auth.service';
 
 // import { Response } from 'express';
 
 @Controller('api/users')
 export class UsersController {
-  private readonly jwtService: JwtService;
   constructor(private readonly usersService: UsersService,
-              private readonly configService: ConfigService) {
-
-    const secret = this.configService.get<string>("JWT_SECRET");
-    const expiresIn = this.configService.get<string>("JWT_EXPIRES_IN");
-    console.log('users.controller::login(): secret:', secret);
-    console.log('users.controller::constructor(): expiresIn:', expiresIn);
-
-    this.jwtService = new JwtService({
-      secret,
-      signOptions: {expiresIn},
-    });
-  }
+              private readonly authService: AuthService) {}
 
   @Post()
   // @HttpCode(HttpStatus.OK)
@@ -34,10 +21,10 @@ export class UsersController {
     const registeredUser = await this.usersService.create(wrapCreateUserDto.user);
     console.log('users.controller::register(): registeredUser:', registeredUser);
 
-    const token = this.jwtService.sign({email: registeredUser.email});
+    const token = this.authService.createToken({email: registeredUser.email});
     console.log('users.controller::register(): token:', token);
 
-    return { user: copyBasedOnDestination(new ResponseUserDto(), {...registeredUser, token})};
+    return { user: copyBasedOnDestination(new ResponseUserDto(), {...registeredUser, token: 'Token ' + token})};
   }
 
   @Post('/login')
@@ -46,10 +33,10 @@ export class UsersController {
     const loginUser = await this.usersService.login(wrapLoginUserDto.user);
     console.log('users.controller::login(): loginUser:', loginUser);
 
-    const token = this.jwtService.sign({email: loginUser.email});
+    const token = this.authService.createToken({email: loginUser.email});
     console.log('users.controller::login(): token:', token);
 
-    return { user: copyBasedOnDestination(new ResponseUserDto(), {...loginUser, token})};
+    return { user: copyBasedOnDestination(new ResponseUserDto(), {...loginUser, token: 'Token ' + token})};
   }
 
   @Post('/login2')

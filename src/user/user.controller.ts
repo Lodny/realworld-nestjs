@@ -1,17 +1,29 @@
-import { Body, Controller, Put } from '@nestjs/common';
+import { Body, Controller, Get, Headers, HttpException, HttpStatus, Put } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { WrapCreateUserDto } from '../users/dto/wrap-create-user.dto';
 import { copyBasedOnDestination } from '../util';
 import { ResponseUserDto } from '../users/dto/response-user.dto';
+import { AuthService } from '../auth/auth.service';
 
 @Controller('api/user')
 export class UserController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService,
+              private readonly authService: AuthService) {}
 
-  // @Get()
-  // currentUser(){
-  //   return this.usersService.findOneByEmail();
-  // }
+  @Get()
+  currentUser(@Headers('Authorization') auth: string){
+    // console.log('user.controller::currentUser(): auth:', auth);
+    if (!auth.startsWith('Token '))
+      throw new HttpException('token is invalid', HttpStatus.BAD_REQUEST);
+
+    const {email} = this.authService.checkToken(auth.split(' ')[1]);
+    console.log('user.controller::currentUser(): email:', email);
+
+    const currentUser = this.usersService.findOneByEmail(email);
+    console.log('user.controller::currentUser(): currentUser:', currentUser);
+
+    return currentUser;
+  }
 
   @Put()
   async updateUser(@Body() wrapCreateUserDto: WrapCreateUserDto) {
