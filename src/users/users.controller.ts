@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, ValidationPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { WrapCreateUserDto } from './dto/wrap-create-user.dto';
 import { ResponseUserDto } from './dto/response-user.dto';
 import { copyBasedOnDestination } from '../util';
 import { WrapLoginUserDto } from './dto/wrap-login-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Controller('api/users')
 export class UsersController {
@@ -19,12 +20,24 @@ export class UsersController {
   }
 
   @Post('/login')
-  async login(@Body() wrapLoginUserDto: WrapLoginUserDto) {
+  async login(@Body(new ValidationPipe()) wrapLoginUserDto: WrapLoginUserDto) {
     console.log('users.controller::login(): wrapLoginUserDto:', wrapLoginUserDto);
     const loginUser = await this.usersService.login(wrapLoginUserDto.user);
     console.log('users.controller::login(): loginUser:', loginUser);
 
     return {user: copyBasedOnDestination(new ResponseUserDto(), {...loginUser, token: 'token'})};
+  }
+
+  @Post('/login2')
+  login2(@Body(new ValidationPipe()) loginUserDto: LoginUserDto) {
+  // login2(@Body() loginUserDto: LoginUserDto) {
+    console.log('users.controller::login2(): loginUserDto:', loginUserDto);
+  }
+
+  //todo::check @ValidateNested()
+  @Post('/login3')
+  async login3(@Body(new ValidationPipe()) wrapLoginUserDto: WrapLoginUserDto) {
+    console.log('users.controller::login2(): wrapLoginUserDto:', wrapLoginUserDto);
   }
 
   // @Get()

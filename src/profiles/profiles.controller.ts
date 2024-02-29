@@ -7,6 +7,10 @@ import { copyBasedOnDestination } from '../util';
 export class ProfilesController {
   constructor(private readonly usersService: UsersService) {}
 
+  // @Get('/:id')
+  // async profileById(@Param('id', ParseIntPipe) id: number) {
+  // }
+
   @Get('/:username')
   async profile(@Param('username') username: string) {
     console.log('profiles.controller::profile(): username:', username);
