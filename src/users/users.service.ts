@@ -4,24 +4,19 @@ import { PrismaRepository } from '../prisma-repository.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 
-
-// import { PrismaClient } from '@prisma/client'
-// const prisma = new PrismaClient()
-
-
 @Injectable()
 export class UsersService {
 
-  constructor(private readonly prismaService: PrismaRepository) {}
+  constructor(private readonly prismaRepository: PrismaRepository) {}
 
   async create(data: CreateUserDto) {
-    return this.prismaService.users.create({
+    return this.prismaRepository.users.create({
       data
     });
   }
 
   async login(loginUserDto: LoginUserDto) {
-    const foundUser = this.prismaService.users.findUnique({
+    const foundUser = this.prismaRepository.users.findUnique({
       where: {email: loginUserDto.email}
     });
 
@@ -38,13 +33,19 @@ export class UsersService {
   }
 
   async update(updateUserDto: UpdateUserDto) {
-    const foundUser = this.prismaService.users.findUnique({
-      where: {email: updateUserDto.email}
+    // const foundUser = this.prismaRepository.users.findUniqueOrThrow({
+    //   where: {email: updateUserDto.email}
+    // });
+    //todo::check values
+
+    const updatedUser = this.prismaRepository.users.update({
+      where: {email: updateUserDto.email},
+      data: updateUserDto
     });
 
-    console.log('users.service::update(): foundUser:', foundUser);
+    console.log('users.service::update(): updatedUser:', updatedUser);
 
-    return foundUser;
+    return updatedUser;
   }
 
   remove(id: number) {
