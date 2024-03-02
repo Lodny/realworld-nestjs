@@ -1,8 +1,10 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { ResponseProfileDto } from '../users/dto/response-profile.dto';
 import { copyBasedOnDestination } from '../util';
+import { AuthGuard } from '../auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('api/profiles')
 export class ProfilesController {
   constructor(private readonly usersService: UsersService) {}

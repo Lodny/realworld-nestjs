@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { WrapCreateUserDto } from './dto/wrap-create-user.dto';
 import { ResponseUserDto } from './dto/response-user.dto';
@@ -6,9 +6,11 @@ import { copyBasedOnDestination } from '../util';
 import { WrapLoginUserDto } from './dto/wrap-login-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { AuthService } from '../auth/auth.service';
+import { AuthGuard } from '../auth/auth.guard';
 
 // import { Response } from 'express';
 
+@UseGuards(AuthGuard)
 @Controller('api/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService,
