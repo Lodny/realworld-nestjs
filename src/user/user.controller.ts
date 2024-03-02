@@ -7,7 +7,6 @@ import { ResponseUserDto } from '../users/dto/response-user.dto';
 import { copyBasedOnDestination } from '../util';
 import { Secured } from '../decorator/secured/secured.decorator';
 import { LoginUser } from '../decorator/login-user/login-user.decorator';
-import { Token } from '../decorator/token/token.decorator';
 
 @UseGuards(AuthGuard)
 @UseInterceptors(AuthInterceptor)

@@ -1,4 +1,14 @@
-import { Controller, Delete, Get, Param, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+  UseGuards,
+  UseInterceptors
+} from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { ResponseProfileDto } from '../users/dto/response-profile.dto';
 import { copyBasedOnDestination } from '../util';
@@ -21,12 +31,18 @@ export class ProfilesController {
     console.log('profiles.controller::profile(): username:', username);
     console.log('profiles.controller::profile(): loginUser:', loginUser);
 
-    const foundUser = await this.usersService.findOneByUsername(username);
-    console.log('profiles.controller::profile(): foundUser:', foundUser);
+    // const foundUser = await this.usersService.findOneByUsername(username);
+    // console.log('profiles.controller::profile(): foundUser:', foundUser);
 
-    return {profile: copyBasedOnDestination(new ResponseProfileDto(), {...foundUser, following: false})};
+    const foundUser = await this.followService.findOneByUsernameWithFollow(username, loginUser.id);
+    console.log('profiles.controller::profile(): foundUser:', foundUser);
+    if (foundUser.length < 0)
+      throw new HttpException('user not found', HttpStatus.NOT_FOUND);
+
+    return {profile: copyBasedOnDestination(new ResponseProfileDto(), foundUser[0])};
   }
 
+  @Secured()
   @Post('/:username/follow')
   async follow(@Param('username') username: string, @LoginUser() loginUser: any) {
     console.log('profiles.controller::follow(): username:', username);
@@ -38,6 +54,7 @@ export class ProfilesController {
     return result;
   }
 
+  @Secured()
   @Delete('/:username/follow')
   async unfollow(@Param('username') username: string, @LoginUser() loginUser: any) {
     console.log('profiles.controller::unfollow(): username:', username);

@@ -18,7 +18,7 @@ export class FollowService {
     console.log('follow.service::follow(): foundUser:', foundUser);
 
     return this.prismaClient.$executeRaw`
-      insert into "Follow" (followee_id, follower_id)
+      insert into "Follow"
       values (${foundUser.id}, ${followerId})
     `;
     // const result = await this.prismaClient.$executeRawUnsafe(`
@@ -38,6 +38,19 @@ export class FollowService {
       delete from "Follow"
       where  followee_id = ${foundUser.id}
       and    follower_id = ${followerId}
+    `;
+  }
+
+  async findOneByUsernameWithFollow(username: string, loginUserId: number): Promise<any[]> {
+    const foundUser = await this.prismaRepository.users.findUnique({where: {username}});
+    console.log('follow.service::follow(): foundUser:', foundUser);
+
+    return this.prismaClient.$queryRaw`
+      select  u.*
+            , (case when f.follower_id is not null then true else false end) as following
+      from    "Users" u 
+      left join "Follow" f on f.followee_id = u.id and f.follower_id = ${loginUserId}
+      where   u.id = ${foundUser.id}
     `;
   }
 }
