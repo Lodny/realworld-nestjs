@@ -20,23 +20,22 @@ export class UserController {
 
   @Get()
   @Secured()
-  currentUser(@LoginUser() loginUser: any, @Token() token: string){
+  currentUser(@LoginUser() loginUser: any){
     this.logger.log(`currentUser() : ${loginUser}`);
     console.log('user.controller::currentUser(): loginUser:', loginUser);
 
-    return {user: copyBasedOnDestination(new ResponseUserDto(), {...loginUser, token})};
+    return {user: copyBasedOnDestination(new ResponseUserDto(), loginUser)};
   }
 
   @Put()
   @Secured()
   async updateUser(@Body() wrapCreateUserDto: WrapCreateUserDto,
-                   @LoginUser() loginUser: any,
-                   @Token() token: string) {
+                   @LoginUser() loginUser: any) {
     console.log('user.controller::updateUser(): wrapCreateUserDto.user:', wrapCreateUserDto.user);
 
     const updatedUser = await this.usersService.update(wrapCreateUserDto.user, loginUser.id);
     console.log('user.controller::updateUser(): updatedUser:', updatedUser);
 
-    return {user: copyBasedOnDestination(new ResponseUserDto(), {...updatedUser, token})};
+    return {user: copyBasedOnDestination(new ResponseUserDto(), {...updatedUser, token: loginUser.token})};
   }
 }
