@@ -27,9 +27,10 @@ export class AuthGuard implements CanActivate {
     if (this.authService.hasNotToken(auth))
       return true;
 
-    const {email} = this.authService.getToken(auth);
+    const [email, token] = this.authService.verify(auth);
     this.logger.log(`canActivate(): email: ${email}`);
     request.email = email;
+    request.token = token;
 
     return true;
   }

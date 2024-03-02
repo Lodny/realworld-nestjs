@@ -23,11 +23,12 @@ export class AuthService {
     return this.jwtService.sign(payload);
   }
 
-  getToken(auth: string) {
-    const token = this.getTokenString(auth);
+  verify(auth: string) {
+    const token = this.getToken(auth);
 
     try {
-      return this.jwtService.verify(token);
+      const {email} = this.jwtService.verify(token);
+      return [email, token];
     } catch (e) {
       if (e instanceof TokenExpiredError)
         console.log('auth.service::checkToken(): TokenExpiredError');
@@ -36,7 +37,7 @@ export class AuthService {
     }
   }
 
-  private getTokenString(auth: string) {
+  private getToken(auth: string) {
     if (!auth || !auth.startsWith(this.tokenStarter))
       throw new HttpException('token is invalid', HttpStatus.BAD_REQUEST);
 

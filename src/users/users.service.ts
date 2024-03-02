@@ -24,7 +24,7 @@ export class UsersService {
     if (!foundUser)
       throw new HttpException(exceptionMessage, status);
 
-    console.log('users.service::findOneByUsername(): foundUser:', foundUser);
+    // console.log('users.service::findOneByUsername(): foundUser:', foundUser);
     return foundUser;
   }
 
