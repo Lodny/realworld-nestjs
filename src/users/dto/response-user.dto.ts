@@ -1,5 +1,3 @@
-import { User } from '../entities/user.entity';
-
 export class ResponseUserDto {
   email: string = '';
   token: string = '';

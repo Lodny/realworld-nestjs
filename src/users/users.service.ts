@@ -9,18 +9,18 @@ type EmailOrUsernameType = { username: string } | { email: string };
 @Injectable()
 export class UsersService {
 
-  constructor(private readonly prismaRepository: PrismaRepository) {
+  constructor(private readonly prisma: PrismaRepository) {
     console.log('users.service::constructor(): 1:', 1);
   }
 
   async create(data: CreateUserDto) {
-    return this.prismaRepository.user.create({
+    return this.prisma.user.create({
       data
     });
   }
 
   async findOneBy(where: EmailOrUsernameType, exceptionMessage: string, status: HttpStatus) {
-    const foundUser = await this.prismaRepository.user.findUnique({where});
+    const foundUser = await this.prisma.user.findUnique({where});
     if (!foundUser)
       throw new HttpException(exceptionMessage, status);
 
@@ -44,7 +44,7 @@ export class UsersService {
     if (foundUser.id !== loginUserId)
       throw new HttpException('The logged-in user and the user information provided for modification are different.', HttpStatus.BAD_REQUEST);
 
-    const updatedUser = this.prismaRepository.user.update({
+    const updatedUser = this.prisma.user.update({
       where: {id: loginUserId},
       data: updateUserDto
     });
@@ -71,7 +71,6 @@ export class UsersService {
   findOne(id: number) {
     return `This action returns a #${id} user`;
   }
-
   currentUser() {
     return 'return current user';
   }

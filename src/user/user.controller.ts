@@ -1,12 +1,12 @@
 import { Body, Controller, Get, Logger, Put, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import { WrapCreateUserDto } from '../users/dto/wrap-create-user.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { AuthInterceptor } from '../auth/auth.interceptor';
 import { ResponseUserDto } from '../users/dto/response-user.dto';
 import { copyBasedOnDestination } from '../util';
 import { Secured } from '../decorator/secured/secured.decorator';
 import { LoginUser } from '../decorator/login-user/login-user.decorator';
+import { WrapUpdateUserDto } from '../users/dto/wrap-update-user.dto';
 
 @UseGuards(AuthGuard)
 @UseInterceptors(AuthInterceptor)
@@ -28,11 +28,11 @@ export class UserController {
 
   @Put()
   @Secured()
-  async updateUser(@Body() wrapCreateUserDto: WrapCreateUserDto,
+  async updateUser(@Body() wrapUpdateUserDto: WrapUpdateUserDto,
                    @LoginUser() loginUser: any) {
-    console.log('user.controller::updateUser(): wrapCreateUserDto.user:', wrapCreateUserDto.user);
+    console.log('user.controller::updateUser(): wrapUpdateUserDto.user:', wrapUpdateUserDto.user);
 
-    const updatedUser = await this.usersService.update(wrapCreateUserDto.user, loginUser.id);
+    const updatedUser = await this.usersService.update(wrapUpdateUserDto.user, loginUser.id);
     console.log('user.controller::updateUser(): updatedUser:', updatedUser);
 
     return {user: copyBasedOnDestination(new ResponseUserDto(), {...updatedUser, token: loginUser.token})};
