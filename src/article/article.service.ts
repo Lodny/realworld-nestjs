@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CreateArticleDto } from './dto/create-article.dto';
-import { UpdateArticleDto } from './dto/update-article.dto';
 import { PrismaRepository } from '../prisma-repository.service';
 import slugify from 'slugify';
+import { QueryArticleDto } from './dto/query-article.dto';
 
 @Injectable()
 export class ArticleService {
@@ -40,22 +40,26 @@ export class ArticleService {
           },
         }
       }
-    })
+    });
   }
 
-  findAll(loginUserId: number) {
-    return `This action returns all article`;
-  }
+  getArticles(query: QueryArticleDto, loginUserId: number) {
+    console.log('article.service::getArticles(): loginUserId:', loginUserId);
 
-  findOne(id: number) {
-    return `This action returns a #${id} article`;
-  }
-
-  update(id: number, updateArticleDto: UpdateArticleDto) {
-    return `This action updates a #${id} article`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} article`;
+    return this.prisma.article.findMany({
+      orderBy: {
+        createdAt: 'desc'
+      },
+      include: {
+        tagList: true,
+        author: {
+          include: {
+            follows: {
+              where: {followerId: loginUserId || -1}
+            }
+          },
+        }
+      }
+    });
   }
 }

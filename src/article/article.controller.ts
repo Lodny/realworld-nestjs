@@ -1,11 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ArticleService } from './article.service';
-import { UpdateArticleDto } from './dto/update-article.dto';
 import { WrapCreateArticleDto } from './dto/wrap-create-article.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { AuthInterceptor } from '../auth/auth.interceptor';
 import { Secured } from '../decorator/secured/secured.decorator';
 import { LoginUser } from '../decorator/login-user/login-user.decorator';
+import { QueryArticleDto } from './dto/query-article.dto';
+import { ResponseArticleDto } from './dto/response-article.dto';
 
 @UseGuards(AuthGuard)
 @UseInterceptors(AuthInterceptor)
@@ -36,37 +37,20 @@ export class ArticleController {
     const article = await this.articleService.getArticleBySlug(slug, loginUser ? loginUser.id: -1);
     console.log('article.controller::getArticle(): article:', article);
 
-
-    const following = article.author.follows.length > 0;
-    delete article.id;
-    delete article.authorId;
-    delete article.author.id;
-    delete article.author.password;
-    delete article.author.email;
-    delete article.author.follows;
-
-    return {article: {
-      ...article
-        , tagList: article.tagList.map(tag => tag.tag)
-        , author: {
-          ...article.author,
-          following
-        }
-    }};
+    return {article: new ResponseArticleDto(article)};
   }
 
   @Get()
-  findAll() {
-    return this.articleService.findAll();
+  async getArticles(@Query() query: QueryArticleDto, @LoginUser() loginUser: any) {
+  // getArticles(@Query('offset') offset: string, @LoginUser() loginUser: any) {
+    console.log('article.controller::getArticles(): query:', query);
+    // console.log('article.controller::getArticles(): offset:', offset);
+    console.log('article.controller::getArticles(): loginUser:', loginUser);
+
+    const articles = await this.articleService.getArticles(query, loginUser ? loginUser.id : -1);
+    console.log('article.controller::getArticles(): articles:', articles);
+
+    return {articles: articles.map(article => new ResponseArticleDto(article))};
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateArticleDto: UpdateArticleDto) {
-    return this.articleService.update(+id, updateArticleDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.articleService.remove(+id);
-  }
 }

@@ -35,7 +35,8 @@ export class ProfilesController {
     if (!foundUser)
       throw new HttpException('user not found', HttpStatus.NOT_FOUND);
 
-    return {profile: copyBasedOnDestination(new ResponseProfileDto(), {...foundUser, following: foundUser['follows'].length > 0})};
+    // return {profile: copyBasedOnDestination(new ResponseProfileDto(), {...foundUser, following: foundUser['follows'].length > 0})};
+    return {profile: new ResponseProfileDto(foundUser)};
 
     // const foundUser = await this.followService.findOneByUsernameWithFollow(username, loginUser.id);
     // console.log('profiles.controller::profile(): foundUser:', foundUser);
