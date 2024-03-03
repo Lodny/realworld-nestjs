@@ -64,7 +64,7 @@ model Tag {
   id         Int      @id @default(autoincrement())
 
   tag        String
-  article    Article  @relation(fields: [articleId], references: [id])
+  article    Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
   articleId  Int
 }
 

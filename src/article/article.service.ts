@@ -21,26 +21,14 @@ export class ArticleService {
           create: createArticleDto.tagList.map(tag => ({tag})),
         }
       },
-      include: {
-        tagList: true,
-        author: true
-      }
+      include: this.getInclude(loginUserId)
     });
   }
 
   getArticleBySlug(slug: string, loginUserId: number) {
     return this.prisma.article.findUnique({
       where: {slug},
-      include: {
-        tagList: true,
-        author: {
-          include: {
-            follows: {
-              where: {followerId: loginUserId || -1}
-            }
-          },
-        }
-      }
+      include: this.getInclude(loginUserId)
     });
   }
 
@@ -48,44 +36,21 @@ export class ArticleService {
     console.log('article.service::getArticles(): loginUserId:', loginUserId);
 
     return this.prisma.article.findMany({
-      orderBy: {
-        createdAt: 'desc'
-      },
-      include: {
-        tagList: true,
-        author: {
-          include: {
-            follows: {
-              where: {followerId: loginUserId || -1}
-            }
-          },
-        }
-      }
+      orderBy: { createdAt: 'desc' },
+      include: this.getInclude(loginUserId)
     });
   }
 
-  //todo::feed not implemented
   async getFeedArticles(query: QueryArticleDto, loginUserId: number) {
     console.log('article.service::getFeedArticles(): loginUserId:', loginUserId);
 
+    //todo::feed not implemented
     return this.prisma.article.findMany({
       where: {
-        author: {
-        }
+        author: {}
       },
-      orderBy: {
-        createdAt: 'desc'
-      },
-      include: {
-        tagList: true,
-        author: {
-          include: {
-            follows: {
-              where: {followerId: loginUserId || -1}
-            }
-          },
-        }
-      }
+      orderBy: { createdAt: 'desc' },
+      include: this.getInclude(loginUserId)
     });
   }
 
@@ -103,20 +68,33 @@ export class ArticleService {
 
     //todo::check not found
     return this.prisma.article.update({
-      where: {
-        slug
-      },
+      where: { slug },
       data: updateArticleDto,
-      include: {
-        tagList: true,
-        author: {
-          include: {
-            follows: {
-              where: {followerId: loginUserId || -1}
-            }
-          },
-        }
+      include: this.getInclude(loginUserId)
+    });
+  }
+
+  deleteArticle(slug: string, loginUserId: number) {
+    console.log('article.service::deleteArticle(): loginUserId:', loginUserId);
+
+    return this.prisma.article.delete({
+      where: {
+        slug,
+        authorId: loginUserId
       }
     });
+  }
+
+  private getInclude(followerId: number) {
+    return {
+      tagList: true,
+      author: {
+        include: {
+          follows: {
+            where: {followerId}
+          }
+        },
+      }
+    };
   }
 }

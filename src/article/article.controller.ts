@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { WrapCreateArticleDto } from './dto/wrap-create-article.dto';
 import { AuthGuard } from '../auth/auth.guard';
@@ -21,13 +21,10 @@ export class ArticleController {
     console.log('article.controller::registerArticle(): wrapCreateArticleDto.article:', wrapCreateArticleDto.article);
     console.log('article.controller::registerArticle(): loginUser:', loginUser);
 
-    const article = await this.articleService.createArticle(wrapCreateArticleDto.article, loginUser.id);
-    console.log('article.controller::registerArticle(): article:', article);
+    const createdArticle = await this.articleService.createArticle(wrapCreateArticleDto.article, loginUser.id);
+    console.log('article.controller::registerArticle(): article:', createdArticle);
 
-    delete article.id;
-    delete article.author.id;
-
-    return {article: {...article, tagList: article.tagList.map(tag => tag.tag)}};
+    return {article: new ResponseArticleDto(createdArticle)};
   }
 
   @Get(':slug')
@@ -79,4 +76,12 @@ export class ArticleController {
     return {article: new ResponseArticleDto(updatedArticle)};
   }
 
+  @Delete('/:slug')
+  @Secured()
+  deleteArticle(@Param('slug') slug: string, @LoginUser() loginUser: any) {
+    console.log('article.controller::deleteArticle(): slug:', slug);
+    console.log('article.controller::deleteArticle(): loginUser:', loginUser);
+
+    return this.articleService.deleteArticle(slug, loginUser.id);
+  }
 }
