@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards, UseInterceptors } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { AuthInterceptor } from '../auth/auth.interceptor';
@@ -28,5 +28,14 @@ export class CommentController {
     return {comment: new ResponseCommentDto(registeredComment)};
   }
 
+  @Get('/comments')
+  async getComments(@Param('slug') slug: string, @LoginUser() loginUser: any) {
+    console.log('comment.controller::getComments(): slug:', slug);
+    console.log('comment.controller::getComments(): loginUser:', loginUser);
 
+    const comments = await this.commentService.getComments(slug, loginUser ? loginUser.id : -1);
+    console.log('comment.controller::getComments(): comments:', comments);
+
+    return {comments: comments.map(comment => new ResponseCommentDto(comment))};
+  }
 }

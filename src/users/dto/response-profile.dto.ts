@@ -5,6 +5,8 @@ export class ResponseProfileDto {
   following: boolean;
 
   constructor(user: any) {
+    if (!user) return;
+
     this.username = user.username;
     this.bio = user.bio;
     this.image = user.image;

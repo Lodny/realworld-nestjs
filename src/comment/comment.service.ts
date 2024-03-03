@@ -21,35 +21,32 @@ export class CommentService {
         , articleId: foundArticle.id
         , authorId: loginUserId
       },
-      include: {
-        author: {
-          include: {
-            follows: {
-              where: { followerId: loginUserId }
-            }
-          }
-        }
-      }
+      include: this.getInclude(loginUserId)
     })
   }
 
-  create(createCommentDto: CreateCommentDto) {
-    return 'This action adds a new comment';
+  async getComments(slug: string, loginUserId: number) {
+    console.log('comment.service::getComments(): loginUserId:', loginUserId);
+
+    const foundArticle = await this.prisma.article.findUnique({where: {slug}});
+    console.log('comment.service::registerComment(): foundArticle:', foundArticle);
+
+    return this.prisma.comment.findMany({
+      where: { articleId: foundArticle.id },
+      orderBy: { createdAt: 'desc' },
+      include: this.getInclude(loginUserId)
+    })
   }
 
-  findAll() {
-    return `This action returns all comment`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} comment`;
-  }
-
-  update(id: number, updateCommentDto: UpdateCommentDto) {
-    return `This action updates a #${id} comment`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
+  private getInclude(followerId: number) {
+    return {
+      author: {
+        include: {
+          follows: {
+            where: { followerId }
+          }
+        }
+      }
+    };
   }
 }
