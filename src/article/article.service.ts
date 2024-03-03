@@ -3,6 +3,7 @@ import { CreateArticleDto } from './dto/create-article.dto';
 import { PrismaRepository } from '../prisma-repository.service';
 import slugify from 'slugify';
 import { QueryArticleDto } from './dto/query-article.dto';
+import { UpdateArticleDto } from './dto/update-article.dto';
 
 @Injectable()
 export class ArticleService {
@@ -50,6 +51,62 @@ export class ArticleService {
       orderBy: {
         createdAt: 'desc'
       },
+      include: {
+        tagList: true,
+        author: {
+          include: {
+            follows: {
+              where: {followerId: loginUserId || -1}
+            }
+          },
+        }
+      }
+    });
+  }
+
+  //todo::feed not implemented
+  async getFeedArticles(query: QueryArticleDto, loginUserId: number) {
+    console.log('article.service::getFeedArticles(): loginUserId:', loginUserId);
+
+    return this.prisma.article.findMany({
+      where: {
+        author: {
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      include: {
+        tagList: true,
+        author: {
+          include: {
+            follows: {
+              where: {followerId: loginUserId || -1}
+            }
+          },
+        }
+      }
+    });
+  }
+
+  async updateArticle(slug: string, updateArticleDto: UpdateArticleDto, loginUserId: number) {
+    if (!updateArticleDto.title)
+      delete updateArticleDto.title;
+    else
+      updateArticleDto['slug'] = slugify(updateArticleDto.title, {lower: true});
+
+    if (!updateArticleDto.description)
+      delete updateArticleDto.description;
+
+    if (!updateArticleDto.body)
+      delete updateArticleDto.body;
+
+    //todo::check not found
+    return this.prisma.article.update({
+      where: {
+        slug
+      },
+      data: updateArticleDto,
       include: {
         tagList: true,
         author: {
