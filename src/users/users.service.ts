@@ -14,13 +14,13 @@ export class UsersService {
   }
 
   async create(data: CreateUserDto) {
-    return this.prismaRepository.users.create({
+    return this.prismaRepository.user.create({
       data
     });
   }
 
   async findOneBy(where: EmailOrUsernameType, exceptionMessage: string, status: HttpStatus) {
-    const foundUser = await this.prismaRepository.users.findUnique({where});
+    const foundUser = await this.prismaRepository.user.findUnique({where});
     if (!foundUser)
       throw new HttpException(exceptionMessage, status);
 
@@ -44,7 +44,7 @@ export class UsersService {
     if (foundUser.id !== loginUserId)
       throw new HttpException('The logged-in user and the user information provided for modification are different.', HttpStatus.BAD_REQUEST);
 
-    const updatedUser = this.prismaRepository.users.update({
+    const updatedUser = this.prismaRepository.user.update({
       where: {id: loginUserId},
       data: updateUserDto
     });

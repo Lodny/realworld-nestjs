@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 import { PrismaRepository } from '../prisma-repository.service';
 
 @Injectable()
@@ -7,12 +7,73 @@ export class FollowService {
 
   private prismaClient  = new PrismaClient();
 
-  constructor(private readonly prismaRepository: PrismaRepository) {}
+  constructor(private readonly prisma: PrismaRepository) {}
 
+  private async findByUsername(followingUsername: string) {
+    const followingUser = await this.prisma.user.findUnique({
+      where: { username: followingUsername }
+    });
+
+    if (!followingUser) {
+      throw new Error(`User with name ${followingUsername} not found.`);
+    }
+
+    return followingUser;
+  }
+
+  async followUser(followingUsername: string, followerId: number): Promise<void> {
+    const followingUser = await this.findByUsername(followingUsername);
+
+    await this.prisma.follow.create({
+      data: {
+        followerId,
+        followingId: followingUser.id
+      },
+    });
+  }
+
+  async unfollowUser(followingUsername: string, followerId: number): Promise<void> {
+    const followingUser = await this.findByUsername(followingUsername);
+
+    // await this.prisma.follow.deleteMany({
+    //   where: {
+    //     followerId,
+    //     followingId: followingUser.id
+    //   },
+    // });
+    await this.prisma.follow.delete({
+      where: {
+        followerId_followingId: {
+          followerId,
+          followingId: followingUser.id
+        }
+      },
+    });
+  }
+
+  async getUserWithFollowing(followingUsername: string, followerId: number): Promise<User | null> {
+    return this.prisma.user.findUnique({
+      where: { username: followingUsername },
+      include: {
+        follows: {
+          where: {
+            followerId
+          },
+          // take: 1 // 하나의 팔로우 정보만 가져옵니다.
+        }
+      }
+    });
+  }
+
+
+
+
+
+  // no orm-modeling
   async follow(followeeUsername: string, followerId: number) {
     console.log('follow.service::follow(): followerId:', followerId);
 
-    const foundUser = await this.prismaRepository.users.findUnique(
+    const foundUser = await this.prisma.user.findUnique(
       {where: {username: followeeUsername}
       });
     console.log('follow.service::follow(): foundUser:', foundUser);
@@ -29,7 +90,7 @@ export class FollowService {
   }
 
   async unfollow(followeeUsername: string, followerId: number) {
-    const foundUser = await this.prismaRepository.users.findUnique(
+    const foundUser = await this.prisma.user.findUnique(
       {where: {username: followeeUsername}
       });
     console.log('follow.service::unfollow(): foundUser:', foundUser);
@@ -42,7 +103,7 @@ export class FollowService {
   }
 
   async findOneByUsernameWithFollow(username: string, loginUserId: number): Promise<any[]> {
-    const foundUser = await this.prismaRepository.users.findUnique({where: {username}});
+    const foundUser = await this.prisma.user.findUnique({where: {username}});
     console.log('follow.service::follow(): foundUser:', foundUser);
 
     return this.prismaClient.$queryRaw`

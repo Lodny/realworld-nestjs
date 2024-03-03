@@ -31,15 +31,19 @@ export class ProfilesController {
     console.log('profiles.controller::profile(): username:', username);
     console.log('profiles.controller::profile(): loginUser:', loginUser);
 
-    // const foundUser = await this.usersService.findOneByUsername(username);
-    // console.log('profiles.controller::profile(): foundUser:', foundUser);
-
-    const foundUser = await this.followService.findOneByUsernameWithFollow(username, loginUser.id);
+    const foundUser = await this.followService.getUserWithFollowing(username, loginUser.id);
     console.log('profiles.controller::profile(): foundUser:', foundUser);
-    if (foundUser.length < 0)
+    if (!foundUser)
       throw new HttpException('user not found', HttpStatus.NOT_FOUND);
 
-    return {profile: copyBasedOnDestination(new ResponseProfileDto(), foundUser[0])};
+    return {profile: copyBasedOnDestination(new ResponseProfileDto(), {...foundUser, following: foundUser['follows'].length > 0})};
+
+    // const foundUser = await this.followService.findOneByUsernameWithFollow(username, loginUser.id);
+    // console.log('profiles.controller::profile(): foundUser:', foundUser);
+    // if (foundUser.length < 0)
+    //   throw new HttpException('user not found', HttpStatus.NOT_FOUND);
+    //
+    // return {profile: copyBasedOnDestination(new ResponseProfileDto(), foundUser[0])};
   }
 
   @Secured()
@@ -48,7 +52,8 @@ export class ProfilesController {
     console.log('profiles.controller::follow(): username:', username);
     console.log('profiles.controller::follow(): loginUser:', loginUser);
 
-    const result = await this.followService.follow(username, loginUser.id);
+    // const result = await this.followService.follow(username, loginUser.id);
+    const result = await this.followService.followUser(username, loginUser.id);
     console.log('profiles.controller::follow(): result:', result);
 
     return result;
@@ -60,7 +65,8 @@ export class ProfilesController {
     console.log('profiles.controller::unfollow(): username:', username);
     console.log('profiles.controller::unfollow(): loginUser:', loginUser);
 
-    const result = await this.followService.unfollow(username, loginUser.id);
+    // const result = await this.followService.unfollow(username, loginUser.id);
+    const result = await this.followService.unfollowUser(username, loginUser.id);
     console.log('profiles.controller::unfollow(): result:', result);
 
     return result;
