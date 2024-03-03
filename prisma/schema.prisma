@@ -49,15 +49,13 @@ model Article {
   body        String
 
   tagList     Tag[]
+  author      User       @relation(fields: [authorId], references: [id])
+  authorId    Int
+  comments    Comment[]
+  favorites   Favorite[]
 
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-
-  author      User       @relation(fields: [authorId], references: [id])
-  authorId    Int
-
-  comments    Comment[]
-  favorites   Favorite[]
 }
 
 model Tag {
@@ -83,8 +81,12 @@ model Comment {
   id         Int    @id @default(autoincrement())
 
   body       String
+
   article    Article   @relation(fields: [articleId], references: [id])
   articleId  Int
-  user       User   @relation(fields: [userId], references: [id])
-  userId     Int
+  author     User   @relation(fields: [authorId], references: [id])
+  authorId   Int
+
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 }

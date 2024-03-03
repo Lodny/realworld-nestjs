@@ -21,10 +21,10 @@ export class ArticleController {
     console.log('article.controller::registerArticle(): wrapCreateArticleDto.article:', wrapCreateArticleDto.article);
     console.log('article.controller::registerArticle(): loginUser:', loginUser);
 
-    const createdArticle = await this.articleService.createArticle(wrapCreateArticleDto.article, loginUser.id);
-    console.log('article.controller::registerArticle(): article:', createdArticle);
+    const registeredArticle = await this.articleService.registerArticle(wrapCreateArticleDto.article, loginUser.id);
+    console.log('article.controller::registerArticle(): article:', registeredArticle);
 
-    return {article: new ResponseArticleDto(createdArticle)};
+    return {article: new ResponseArticleDto(registeredArticle)};
   }
 
   @Get(':slug')

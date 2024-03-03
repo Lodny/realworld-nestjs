@@ -11,7 +11,7 @@ export class ArticleService {
   constructor(private readonly prisma: PrismaRepository) {
   }
 
-  createArticle(createArticleDto: CreateArticleDto, loginUserId: number) {
+  registerArticle(createArticleDto: CreateArticleDto, loginUserId: number) {
     return this.prisma.article.create({
       data: {
         ...createArticleDto
