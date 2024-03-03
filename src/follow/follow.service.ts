@@ -51,7 +51,7 @@ export class FollowService {
     });
   }
 
-  async getUserWithFollowing(followingUsername: string, followerId: number): Promise<User | null> {
+  getUserWithFollowing(followingUsername: string, followerId: number): Promise<User | null> {
     return this.prisma.user.findUnique({
       where: { username: followingUsername },
       include: {
@@ -59,7 +59,7 @@ export class FollowService {
           where: {
             followerId
           },
-          // take: 1 // 하나의 팔로우 정보만 가져옵니다.
+        //   take: 1 // 하나의 팔로우 정보만 가져옵니다.
         }
       }
     });

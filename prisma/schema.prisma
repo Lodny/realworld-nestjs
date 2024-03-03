@@ -48,7 +48,7 @@ model Article {
   description String
   body        String
 
-  tags        Tag[]
+  tagList     Tag[]
 
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
@@ -61,13 +61,16 @@ model Article {
 }
 
 model Tag {
-  id       Int    @id @default(autoincrement())
-  name     String
-  articles Article[]
+  id         Int      @id @default(autoincrement())
+
+  tag        String
+  article    Article  @relation(fields: [articleId], references: [id])
+  articleId  Int
 }
 
 model Favorite {
   id         Int      @id @default(autoincrement())
+
   article    Article  @relation(fields: [articleId], references: [id])
   articleId  Int
   user       User     @relation(fields: [userId], references: [id])
@@ -78,6 +81,7 @@ model Favorite {
 
 model Comment {
   id         Int    @id @default(autoincrement())
+
   body       String
   article    Article   @relation(fields: [articleId], references: [id])
   articleId  Int

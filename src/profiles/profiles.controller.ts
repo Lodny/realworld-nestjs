@@ -25,13 +25,12 @@ export class ProfilesController {
   constructor(private readonly usersService: UsersService,
               private readonly followService: FollowService) {}
 
-  @Secured()
   @Get('/:username')
   async profile(@Param('username') username: string, @LoginUser() loginUser: any) {
     console.log('profiles.controller::profile(): username:', username);
     console.log('profiles.controller::profile(): loginUser:', loginUser);
 
-    const foundUser = await this.followService.getUserWithFollowing(username, loginUser.id);
+    const foundUser = await this.followService.getUserWithFollowing(username, loginUser ? loginUser.id : -1);
     console.log('profiles.controller::profile(): foundUser:', foundUser);
     if (!foundUser)
       throw new HttpException('user not found', HttpStatus.NOT_FOUND);

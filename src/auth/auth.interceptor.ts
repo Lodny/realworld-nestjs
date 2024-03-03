@@ -14,9 +14,9 @@ export class AuthInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
     this.logger.log(`intercept(): request.email: ${request.email}`);
 
-    if (!request.email) return;
-
-    request.loginUser = this.usersService.findOneByEmail(request.email);
+    request.loginUser = null;
+    if (request.email)
+      request.loginUser = this.usersService.findOneByEmail(request.email);
 
     return next.handle();
   }
