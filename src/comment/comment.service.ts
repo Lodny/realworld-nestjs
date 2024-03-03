@@ -29,7 +29,7 @@ export class CommentService {
     console.log('comment.service::getComments(): loginUserId:', loginUserId);
 
     const foundArticle = await this.prisma.article.findUnique({where: {slug}});
-    console.log('comment.service::registerComment(): foundArticle:', foundArticle);
+    console.log('comment.service::getComments(): foundArticle:', foundArticle);
 
     return this.prisma.comment.findMany({
       where: { articleId: foundArticle.id },
@@ -48,5 +48,21 @@ export class CommentService {
         }
       }
     };
+  }
+
+  async deleteComment(slug: string, id: number, loginUserId: number) {
+    console.log('comment.service::deleteComment(): loginUserId:', loginUserId);
+
+    const foundArticle = await this.prisma.article.findUnique({where: {slug}});
+    console.log('comment.service::deleteComment(): foundArticle:', foundArticle);
+
+    //todo::check delete error
+    return this.prisma.comment.delete({
+      where: {
+        id,
+        articleId: foundArticle.id,
+        authorId: loginUserId
+      }
+    });
   }
 }

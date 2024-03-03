@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards, UseInterceptors } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { AuthInterceptor } from '../auth/auth.interceptor';
@@ -37,5 +37,17 @@ export class CommentController {
     console.log('comment.controller::getComments(): comments:', comments);
 
     return {comments: comments.map(comment => new ResponseCommentDto(comment))};
+  }
+
+  @Secured()
+  @Delete('/comments/:id')
+  deleteComment(@Param('slug') slug: string,
+                @Param('id', ParseIntPipe) id: number,
+                @LoginUser() loginUser: any) {
+    console.log('comment.controller::registerComment(): slug:', slug);
+    console.log('comment.controller::deleteComment(): id:', id);
+    console.log('comment.controller::registerComment(): loginUser:', loginUser);
+
+    return this.commentService.deleteComment(slug, id, loginUser.id);
   }
 }
