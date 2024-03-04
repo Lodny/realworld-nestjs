@@ -28,7 +28,7 @@ export class ArticleService {
   getArticleBySlug(slug: string, loginUserId: number) {
     return this.prisma.article.findUnique({
       where: {slug},
-      include: this.getInclude(loginUserId)
+      include: this.getInclude(loginUserId),
     });
   }
 
@@ -85,16 +85,24 @@ export class ArticleService {
     });
   }
 
-  private getInclude(followerId: number) {
+  private getInclude(loginUserId: number) {
     return {
       tagList: true,
       author: {
         include: {
           follows: {
-            where: {followerId}
+            where: {followerId: loginUserId}
           }
         },
-      }
+      },
+      favorites: {
+        where: {
+          userId: loginUserId,
+        }
+      },
+      _count: {
+        select: { favorites: true },
+      },
     };
   }
 }

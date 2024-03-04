@@ -25,8 +25,8 @@ export class ResponseArticleDto {
     this.createdAt = article.createdAt;
     this.updatedAt = article.updatedAt;
 
-    this.favorited = false;
-    this.favoritesCount = 0;
+    this.favorited = article.favorites.length > 0;
+    this.favoritesCount = article._count.favorites;
     this.author = new ResponseProfileDto(article.author);
   }
 }

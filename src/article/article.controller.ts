@@ -8,12 +8,14 @@ import { LoginUser } from '../decorator/login-user/login-user.decorator';
 import { QueryArticleDto } from './dto/query-article.dto';
 import { ResponseArticleDto } from './dto/response-article.dto';
 import { WrapUpdateArticleDto } from './dto/wrap-update-article.dto';
+import { FavoriteService } from '../favorite/favorite.service';
 
 @UseGuards(AuthGuard)
 @UseInterceptors(AuthInterceptor)
 @Controller('api/articles')
 export class ArticleController {
-  constructor(private readonly articleService: ArticleService) {}
+  constructor(private readonly articleService: ArticleService,
+              private readonly favoriteService: FavoriteService) {}
 
   @Post()
   @Secured()
@@ -83,5 +85,23 @@ export class ArticleController {
     console.log('article.controller::deleteArticle(): loginUser:', loginUser);
 
     return this.articleService.deleteArticle(slug, loginUser.id);
+  }
+
+  @Post('/:slug/favorite')
+  @Secured()
+  favoriteArticle(@Param('slug') slug: string, @LoginUser() loginUser: any) {
+    console.log('article.controller::favoriteArticle(): slug:', slug);
+    console.log('article.controller::favoriteArticle(): loginUser:', loginUser);
+
+    return this.favoriteService.favoriteArticle(slug, loginUser.id);
+  }
+
+  @Delete('/:slug/favorite')
+  @Secured()
+  unfavoriteArticle(@Param('slug') slug: string, @LoginUser() loginUser: any) {
+    console.log('article.controller::unfavoriteArticle(): slug:', slug);
+    console.log('article.controller::unfavoriteArticle(): loginUser:', loginUser);
+
+    return this.favoriteService.unfavoriteArticle(slug, loginUser.id);
   }
 }
