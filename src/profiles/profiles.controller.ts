@@ -10,13 +10,12 @@ import {
   UseInterceptors
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import { ResponseProfileDto } from '../users/dto/response-profile.dto';
-import { copyBasedOnDestination } from '../util';
 import { AuthGuard } from '../auth/auth.guard';
 import { LoginUser } from '../decorator/login-user/login-user.decorator';
 import { FollowService } from '../follow/follow.service';
 import { Secured } from '../decorator/secured/secured.decorator';
 import { AuthInterceptor } from '../auth/auth.interceptor';
+import { ResponseProfileDto } from './dto/response-profile.dto';
 
 @UseGuards(AuthGuard)
 @UseInterceptors(AuthInterceptor)

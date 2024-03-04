@@ -1,4 +1,4 @@
-import { ResponseProfileDto } from '../../users/dto/response-profile.dto';
+import { ResponseProfileDto } from '../../profiles/dto/response-profile.dto';
 
 export class ResponseArticleDto {
   slug: string;

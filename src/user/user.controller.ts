@@ -3,7 +3,6 @@ import { UsersService } from '../users/users.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { AuthInterceptor } from '../auth/auth.interceptor';
 import { ResponseUserDto } from '../users/dto/response-user.dto';
-import { copyBasedOnDestination } from '../util';
 import { Secured } from '../decorator/secured/secured.decorator';
 import { LoginUser } from '../decorator/login-user/login-user.decorator';
 import { WrapUpdateUserDto } from '../users/dto/wrap-update-user.dto';
@@ -19,11 +18,12 @@ export class UserController {
 
   @Get()
   @Secured()
+  // currentUser(@LoginUser() loginUser: any, @Token() token: string){
   currentUser(@LoginUser() loginUser: any){
     this.logger.log(`currentUser() : ${loginUser}`);
     console.log('user.controller::currentUser(): loginUser:', loginUser);
 
-    return {user: copyBasedOnDestination(new ResponseUserDto(), loginUser)};
+    return {user: new ResponseUserDto(loginUser, loginUser.token)};
   }
 
   @Put()
@@ -35,6 +35,6 @@ export class UserController {
     const updatedUser = await this.usersService.update(wrapUpdateUserDto.user, loginUser.id);
     console.log('user.controller::updateUser(): updatedUser:', updatedUser);
 
-    return {user: copyBasedOnDestination(new ResponseUserDto(), {...updatedUser, token: loginUser.token})};
+    return {user: new ResponseUserDto(updatedUser, loginUser.token)};
   }
 }

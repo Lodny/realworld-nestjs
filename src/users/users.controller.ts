@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/c
 import { UsersService } from './users.service';
 import { WrapCreateUserDto } from './dto/wrap-create-user.dto';
 import { ResponseUserDto } from './dto/response-user.dto';
-import { copyBasedOnDestination } from '../util';
 import { WrapLoginUserDto } from './dto/wrap-login-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { AuthService } from '../auth/auth.service';
@@ -26,7 +25,7 @@ export class UsersController {
     const token = this.authService.createToken({email: registeredUser.email});
     console.log('users.controller::register(): token:', token);
 
-    return { user: copyBasedOnDestination(new ResponseUserDto(), {...registeredUser, token: 'Token ' + token})};
+    return { user: new ResponseUserDto(registeredUser, token)};
   }
 
   @Post('/login')
@@ -38,7 +37,7 @@ export class UsersController {
     const token = this.authService.createToken({email: loginUser.email});
     console.log('users.controller::login(): token:', token);
 
-    return { user: copyBasedOnDestination(new ResponseUserDto(), {...loginUser, token: 'Token ' + token})};
+    return { user: new ResponseUserDto(loginUser, token)};
   }
 
   @Post('/login2')
