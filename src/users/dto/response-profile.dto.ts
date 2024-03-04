@@ -9,7 +9,7 @@ export class ResponseProfileDto {
 
     this.username = user.username;
     this.bio = user.bio;
-    this.image = user.image;
+    this.image = user.image || 'https://api.realworld.io/images/demo-avatar.png';
     this.following = user.follows.length > 0;
   }
 }

@@ -48,7 +48,13 @@ export class ArticleController {
     const articles = await this.articleService.getArticles(query, loginUser ? loginUser.id : -1);
     console.log('article.controller::getArticles(): articles:', articles);
 
-    return {articles: articles.map(article => new ResponseArticleDto(article))};
+    //todo::paging
+    return {
+      articles: articles.map(article => new ResponseArticleDto(article)),
+      articlesCount: articles.length,
+      number: 0,
+      totalPages: 2
+    };
   }
 
   @Get('/feed')
