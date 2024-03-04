@@ -86,28 +86,33 @@ export class ArticleController {
 
   @Delete('/:slug')
   @Secured()
-  deleteArticle(@Param('slug') slug: string, @LoginUser() loginUser: any) {
+  async deleteArticle(@Param('slug') slug: string, @LoginUser() loginUser: any) {
     console.log('article.controller::deleteArticle(): slug:', slug);
     console.log('article.controller::deleteArticle(): loginUser:', loginUser);
 
-    return this.articleService.deleteArticle(slug, loginUser.id);
+    const article = await this.articleService.deleteArticle(slug, loginUser.id);
+    return {article: new ResponseArticleDto(article)};
   }
 
   @Post('/:slug/favorite')
   @Secured()
-  favoriteArticle(@Param('slug') slug: string, @LoginUser() loginUser: any) {
+  async favoriteArticle(@Param('slug') slug: string, @LoginUser() loginUser: any) {
     console.log('article.controller::favoriteArticle(): slug:', slug);
     console.log('article.controller::favoriteArticle(): loginUser:', loginUser);
 
-    return this.favoriteService.favoriteArticle(slug, loginUser.id);
+    const article = await this.favoriteService.favoriteArticle(slug, loginUser.id);
+    return {article: new ResponseArticleDto(article)};
   }
 
   @Delete('/:slug/favorite')
   @Secured()
-  unfavoriteArticle(@Param('slug') slug: string, @LoginUser() loginUser: any) {
+  async unfavoriteArticle(@Param('slug') slug: string, @LoginUser() loginUser: any) {
     console.log('article.controller::unfavoriteArticle(): slug:', slug);
     console.log('article.controller::unfavoriteArticle(): loginUser:', loginUser);
 
-    return this.favoriteService.unfavoriteArticle(slug, loginUser.id);
+    const article = await this.favoriteService.unfavoriteArticle(slug, loginUser.id);
+    console.log('article.controller::unfavoriteArticle(): article:', article);
+
+    return {article: new ResponseArticleDto(article)};
   }
 }

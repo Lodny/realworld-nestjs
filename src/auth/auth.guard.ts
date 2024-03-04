@@ -17,8 +17,6 @@ export class AuthGuard implements CanActivate {
 
   canActivate(context: ExecutionContext,): boolean | Promise<boolean> | Observable<boolean> {
     const hasSecuredDecorator = !!this.reflector.get<string[]>('secured', context.getHandler());
-    this.logger.log(`canActivate(): hasSecuredDecorator: ${hasSecuredDecorator}`);
-
     const request = context.switchToHttp().getRequest();
     const auth = request.headers.authorization;
     if (hasSecuredDecorator && this.authService.hasNotToken(auth))

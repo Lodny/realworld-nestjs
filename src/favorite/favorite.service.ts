@@ -15,6 +15,9 @@ export class FavoriteService {
     });
     console.log('favorite.service::favoriteArticle(): foundArticle:', foundArticle);
 
+    if (loginUserId === foundArticle.authorId)
+      return foundArticle;
+
     await this.prisma.favorite.create({
       data: {
         articleId: foundArticle.id,
@@ -22,7 +25,10 @@ export class FavoriteService {
       }
     });
 
-    return {...foundArticle, favorites: [1]};
+    return this.prisma.article.findUnique({
+      where: {slug},
+      include: this.getInclude(loginUserId)
+    });
   }
 
   async unfavoriteArticle(slug: string, loginUserId: number) {
@@ -34,6 +40,9 @@ export class FavoriteService {
     });
     console.log('favorite.service::unfavoriteArticle(): foundArticle:', foundArticle);
 
+    if (loginUserId === foundArticle.authorId)
+      return foundArticle;
+
     await this.prisma.favorite.delete({
       where: {
         articleId_userId: {
@@ -42,17 +51,27 @@ export class FavoriteService {
         }
       }
     });
+    console.log('favorite.service::unfavoriteArticle(): delete:');
 
-    return {...foundArticle, favorites: [1]};
+    return this.prisma.article.findUnique({
+      where: {slug},
+      include: this.getInclude(loginUserId)
+    });
   }
 
   private getInclude(loginUserId: number) {
     return {
+      tagList: true,
       author: {
         include: {
           follows: {
             where: { followerId: loginUserId }
           }
+        }
+      },
+      favorites: {
+        where: {
+          userId: loginUserId,
         }
       },
       _count: {
