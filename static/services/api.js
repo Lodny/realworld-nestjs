@@ -100,6 +100,7 @@ class RealApi {
             tag,
             author,
             favorited,
+            feed,
             offset,
             limit,
         } = param;
@@ -112,15 +113,17 @@ class RealApi {
         console.log('api::realApi.getArticles(): offset:', offset);
         console.log('api::realApi.getArticles(): limit:', limit);
 
-        let url = `/articles?offset=${offset}&limit=${limit}`;
+        let url = `/articles?`;
         if (tag)
-            return apiGet(url + `&tag=${tag}`);
+            url += `tag=${tag}&`;
         else if (author)
-            return apiGet(url + `&author=${author}`);
+            url += `author=${author}&`;
         else if (favorited)
-            return apiGet(url + `&favorited=${favorited}`);
+            url += `favorited=${favorited}&`;
+        else if (feed)
+            url = `/articles/feed?`;
 
-        return apiGet(`/articles?offset=${offset}&limit=${limit}`);
+        return apiGet(`${url}offset=${offset}&limit=${limit}`);
     }
 
     deleteArticle = (slug) => {

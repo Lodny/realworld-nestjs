@@ -88,7 +88,7 @@ class HomePage extends HTMLElement {
 
         } else if (activeTab === 'Your Feed') {
             const user = currentUser();
-            param = {author: user.username}
+            param = {feed: user.username}
         } else {
             param = {tag: activeTab.slice(1)}
         }

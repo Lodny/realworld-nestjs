@@ -29,7 +29,24 @@ export class ArticleController {
     return {article: new ResponseArticleDto(registeredArticle)};
   }
 
-  @Get(':slug')
+  @Secured()
+  @Get('/feed')
+  async getFeedArticles(@Query() query: QueryArticleDto, @LoginUser() loginUser: any) {
+    console.log('article.controller::getFeedArticles(): query:', query);
+    console.log('article.controller::getFeedArticles(): loginUser:', loginUser);
+
+    const articlePage = await this.articleService.getFeedArticles(query, loginUser.id);
+    console.log('article.controller::getFeedArticles(): articlePage:', articlePage);
+
+    return {
+      articles: articlePage.articles.map(article => new ResponseArticleDto(article)),
+      articlesCount: articlePage.articles.length,
+      number: query.page,
+      totalPages: query.totalPage(articlePage.totalCount),
+    };
+  }
+
+  @Get('/:slug')
   async getArticle(@Param('slug') slug: string, @LoginUser() loginUser: any) {
     console.log('article.controller::getArticle(): slug:', slug);
     console.log('article.controller::getArticle(): loginUser:', loginUser);
@@ -48,25 +65,12 @@ export class ArticleController {
     const articlePage = await this.articleService.getArticles(query, loginUser ? loginUser.id : -1);
     console.log('article.controller::getArticles(): articlePage:', articlePage);
 
-    //todo::paging
     return {
       articles: articlePage.articles.map(article => new ResponseArticleDto(article)),
       articlesCount: articlePage.articles.length,
       number: query.page,
       totalPages: query.totalPage(articlePage.totalCount),
     };
-  }
-
-  @Get('/feed')
-  @Secured()
-  async getFeedArticles(@Query() query: QueryArticleDto, @LoginUser() loginUser: any) {
-    console.log('article.controller::getFeedArticles(): query:', query);
-    console.log('article.controller::getFeedArticles(): loginUser:', loginUser);
-
-    const articles = await this.articleService.getFeedArticles(query, loginUser ? loginUser.id : -1);
-    console.log('article.controller::getFeedArticles(): articles:', articles);
-
-    return {articles: articles.map(article => new ResponseArticleDto(article))};
   }
 
   @Put('/:slug')

@@ -80,14 +80,29 @@ export class ArticleService {
   async getFeedArticles(query: QueryArticleDto, loginUserId: number) {
     console.log('article.service::getFeedArticles(): loginUserId:', loginUserId);
 
-    //todo::feed not implemented
-    return this.prisma.article.findMany({
-      where: {
-        author: {}
-      },
+    const loginUser = await this.prisma.user.findUnique({
+      where: { id: loginUserId },
+      // include: { followers: true },
+      select: { followers: true }
+    });
+    console.log('article.service::getFeedArticles(): loginUser', loginUser);
+
+    const where = { authorId: {
+        in: loginUser.followers.map(follower => follower.followingId)
+      } };
+
+    const totalCount = await this.prisma.article.count({where});
+    console.log('article.service::getArticles(): totalCount:', totalCount);
+
+    const articles = await this.prisma.article.findMany({
+      skip: query.offset,
+      take: query.limit,
+      where,
       orderBy: { createdAt: 'desc' },
       include: this.getInclude(loginUserId)
     });
+
+    return {articles, totalCount};
   }
 
   async updateArticle(slug: string, updateArticleDto: UpdateArticleDto, loginUserId: number) {
