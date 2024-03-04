@@ -32,13 +32,49 @@ export class ArticleService {
     });
   }
 
-  getArticles(query: QueryArticleDto, loginUserId: number) {
+  async getArticles(query: QueryArticleDto, loginUserId: number) {
     console.log('article.service::getArticles(): loginUserId:', loginUserId);
 
-    return this.prisma.article.findMany({
+    const where = query.tag
+      ? this.getTagWhere(query.tag)
+      : query.author
+        ? await this.getAuthorWhere(query.author)
+        : query.favorited
+          ? await this.getFavoritedWhere(query.favorited)
+          : {};
+
+    const totalCount = await this.prisma.article.count({where});
+    console.log('article.service::getArticles(): totalCount:', totalCount);
+
+    const articles = await this.prisma.article.findMany({
+      skip: query.offset,
+      take: query.limit,
+      where,
       orderBy: { createdAt: 'desc' },
       include: this.getInclude(loginUserId)
     });
+
+    return {articles, totalCount};
+  }
+
+  private getTagWhere(tag) {
+    return { tagList: { some: { tag: { contains: tag } } } };
+  }
+
+  private async getAuthorWhere(author) {
+    const user = await this.prisma.user.findUnique({ where: { username: author } });
+    console.log('article.service::getAuthorWhere(): user:', user);
+
+    return { authorId: user.id };
+  }
+
+  private async getFavoritedWhere(favorited) {
+    const user = await this.prisma.user.findUnique({
+      where: { username: favorited },
+      include: { favorites: true }
+    });
+
+    return { id: { in: user.favorites.map(f => f.articleId) } }
   }
 
   async getFeedArticles(query: QueryArticleDto, loginUserId: number) {

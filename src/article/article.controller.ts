@@ -45,15 +45,15 @@ export class ArticleController {
     console.log('article.controller::getArticles(): query:', query);
     console.log('article.controller::getArticles(): loginUser:', loginUser);
 
-    const articles = await this.articleService.getArticles(query, loginUser ? loginUser.id : -1);
-    console.log('article.controller::getArticles(): articles:', articles);
+    const articlePage = await this.articleService.getArticles(query, loginUser ? loginUser.id : -1);
+    console.log('article.controller::getArticles(): articlePage:', articlePage);
 
     //todo::paging
     return {
-      articles: articles.map(article => new ResponseArticleDto(article)),
-      articlesCount: articles.length,
-      number: 0,
-      totalPages: 2
+      articles: articlePage.articles.map(article => new ResponseArticleDto(article)),
+      articlesCount: articlePage.articles.length,
+      number: query.page,
+      totalPages: query.totalPage(articlePage.totalCount),
     };
   }
 

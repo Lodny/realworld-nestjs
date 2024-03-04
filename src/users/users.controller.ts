@@ -51,27 +51,4 @@ export class UsersController {
   async login3(@Body() wrapLoginUserDto: WrapLoginUserDto) {
     console.log('users.controller::login2(): wrapLoginUserDto:', wrapLoginUserDto);
   }
-
-  // @Get()
-  // findAll() {
-  //   return this.usersService.findAll();
-  // }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
-  }
-
-  // @Post()
-  // createTest(@Res() res: Response) {
-  //   console.log('users.controller::createTest(): res:', res);
-  //   res.status(HttpStatus.CREATED).json({
-  //    ...
-  //   });
-  // }
 }
